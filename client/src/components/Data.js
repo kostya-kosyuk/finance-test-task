@@ -1,29 +1,80 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import io from 'socket.io-client';
-import { Box } from "@mui/material";
-
-const columns = [
-    { field: 'ticker', headerName: 'Ticker'},
-    { field: 'exchange', headerName: 'Exchange'},
-    { field: 'price', headerName: 'Price', type: 'number'},
-    { field: 'change', headerName: 'Change', type: 'number'},
-    { field: 'change_percent', headerName: 'Change Percent', type: 'number'},
-    { field: 'dividend', headerName: 'Dividend', type: 'number'},
-    { field: 'yield', headerName: 'Yield', type: 'number'},
-    { field: 'last_trade_time', headerName: 'Last Trade Time', type: 'dateTime',
-        renderCell: (params) => {
-            return (
-                <div>
-                    {params.value.toLocaleTimeString()}
-                </div>
-            );
-        }
-},
-];
+import { Box, IconButton } from "@mui/material";
+import { Add } from '@mui/icons-material';
 
 const Data = () => {
     const [quotes, setQuotes] = useState([]);
+    const trackedQuotes = useMemo(() => quotes
+        ? quotes.filter(qoute => qoute.isTracked)
+        : null,
+    [quotes]);
+    const untrackedQuotes = useMemo(() => quotes
+        ? quotes.filter(qoute => !qoute.isTracked)
+        : null,
+    [quotes]);
+
+    const handleQuotesUpdate = (newQuotes) => {
+        if (quotes.length === 0) {
+            setQuotes(newQuotes.map(quote => ({...quote, id: quote.ticker, isTracked: false})));
+        } else {
+            setQuotes(prev => prev.map(quote => ({ ...quote, ...newQuotes.find(ticker => ticker === quote.ticker)})));
+        }
+    };
+
+    const handleToggleQuoteTracking = (id) => {
+        setQuotes(prev => {
+            const updatedQuotes = prev.map(quote => {
+                if (quote.id === id) {
+                    return { ...quote, isTracked: !quote.isTracked };
+                }
+                return quote;
+            });
+
+            return updatedQuotes;
+        });
+    };
+
+    const columns = [
+        { field: 'ticker', headerName: 'Ticker' },
+        { field: 'exchange', headerName: 'Exchange' },
+        { field: 'price', headerName: 'Price', type: 'number' },
+        { field: 'change', headerName: 'Change', type: 'number' },
+        { field: 'change_percent', headerName: 'Change Percent', type: 'number' },
+        { field: 'dividend', headerName: 'Dividend', type: 'number' },
+        { field: 'yield', headerName: 'Yield', type: 'number' },
+        {
+            field: 'last_trade_time', headerName: 'Last Trade Time', type: 'dateTime',
+            renderCell: (params) => {
+                return (
+                    <div>
+                        {params.value.toLocaleTimeString()}
+                    </div>
+                );
+            }
+        },
+        {
+            field: 'isTracked', headerName: 'Is Tracked',
+            renderCell: (params) => {
+                return (
+                    <Box width={'100%'}
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}
+                    >
+                        <IconButton
+                            onClick={() => handleToggleQuoteTracking(params.row.id)}
+                        >
+                            <Add />
+                        </IconButton>
+                    </Box>
+                )
+            },
+        },
+    ];
 
     useEffect(() => {
         const socket = io('http://localhost:4000');
@@ -33,7 +84,7 @@ const Data = () => {
         });
 
         socket.on('ticker', (quotes) => {
-            setQuotes(quotes);
+            handleQuotesUpdate(quotes);
         });
 
         socket.on('disconnect', () => {
@@ -47,14 +98,24 @@ const Data = () => {
     return (
             <>
             {quotes
-                ? (<Box width={820} margin={'auto'}>
-                    <DataGrid
-                        autoHeight
-                        rowCount={quotes.length}
-                        columns={columns}
-                        rows={getRows(quotes)}
-                    />
-                </Box>)
+                ? (<>
+                    <Box width={920} margin={'auto'} marginY={2}>
+                        <DataGrid
+                            autoHeight
+                            rowCount={quotes.length}
+                            columns={columns}
+                            rows={getRows(trackedQuotes)}
+                        />
+                    </Box>
+                    <Box width={920} margin={'auto'} marginY={2}>
+                        <DataGrid
+                            autoHeight
+                            rowCount={quotes.length}
+                            columns={columns}
+                            rows={getRows(untrackedQuotes)}
+                        />
+                    </Box>
+                </>)
                 : 'Loading...'}
             </>
     );
@@ -63,7 +124,7 @@ const Data = () => {
 export default Data;
 
 const getRows = (data) => {
-    const res = data.map((el) => ({ id: el.ticker, ...el, last_trade_time: new Date(el.last_trade_time) }));
+    const res = data.map((el) => ({ ...el, last_trade_time: new Date(el.last_trade_time) }));
 
     return res;
 };
