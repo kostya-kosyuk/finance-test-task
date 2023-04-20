@@ -12,6 +12,7 @@ const tickers = [
 
 const createQuotes = () => {
     return tickers.map(ticker => ({
+        id: ticker,
         ticker,
         startPrice: randomValue(100, 300, 2),
         exchange: 'NASDAQ',

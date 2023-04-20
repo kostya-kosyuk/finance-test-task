@@ -1,11 +1,14 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import io from 'socket.io-client';
 import { Box, IconButton } from "@mui/material";
 import { Add, Clear } from '@mui/icons-material';
+import { useDispatch, useSelector } from 'react-redux';
 
 const Data = () => {
-    const [quotes, setQuotes] = useState([]);
+    const dispatch = useDispatch();
+    const quotes = useSelector(state => state.quotes.quotes);
+
     const trackedQuotes = useMemo(() => quotes
         ? quotes.filter(qoute => qoute.isTracked)
         : null,
@@ -15,32 +18,15 @@ const Data = () => {
         : null,
     [quotes]);
 
-    const handleQuotesUpdate = (newQuotes) => {
-        setQuotes(prev => {
-            if (prev.length !== 0) {
-                return newQuotes.map(quote => {
-                    const prevQuote = prev.find(({ticker}) => ticker === quote.ticker);
+    const handleQuotesUpdate = useCallback((quotes) => dispatch({
+        type: 'SET_QUOTES',
+        payload: quotes
+    }), []);
 
-                    return { ...prevQuote, ...quote };
-                })
-            } else {
-                return newQuotes.map(quote => ({id: quote.ticker, ...quote, isTracked: false}));
-            }
-        });
-    };
-
-    const handleToggleQuoteTracking = (id) => {
-        setQuotes(prev => {
-            const updatedQuotes = prev.map(quote => {
-                if (quote.id === id) {
-                    return { ...quote, isTracked: !quote.isTracked };
-                }
-                return quote;
-            });
-
-            return updatedQuotes;
-        });
-    };
+    const handleToggleQuoteTracking = useCallback((id) => dispatch({
+            type: 'TOGGLE_QUOTE_TRACKING',
+            payload: id
+        }), []);
 
     const columns = [
         { field: 'ticker', headerName: 'Ticker' },
