@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import io from 'socket.io-client';
 import { Box, IconButton } from "@mui/material";
-import { Add } from '@mui/icons-material';
+import { Add, Clear } from '@mui/icons-material';
 
 const Data = () => {
     const [quotes, setQuotes] = useState([]);
@@ -16,11 +16,17 @@ const Data = () => {
     [quotes]);
 
     const handleQuotesUpdate = (newQuotes) => {
-        if (quotes.length === 0) {
-            setQuotes(newQuotes.map(quote => ({...quote, id: quote.ticker, isTracked: false})));
-        } else {
-            setQuotes(prev => prev.map(quote => ({ ...quote, ...newQuotes.find(ticker => ticker === quote.ticker)})));
-        }
+        setQuotes(prev => {
+            if (prev.length !== 0) {
+                return newQuotes.map(quote => {
+                    const prevQuote = prev.find(({ticker}) => ticker === quote.ticker);
+
+                    return { ...prevQuote, ...quote };
+                })
+            } else {
+                return newQuotes.map(quote => ({id: quote.ticker, ...quote, isTracked: false}));
+            }
+        });
     };
 
     const handleToggleQuoteTracking = (id) => {
@@ -68,7 +74,9 @@ const Data = () => {
                         <IconButton
                             onClick={() => handleToggleQuoteTracking(params.row.id)}
                         >
-                            <Add />
+                            {params.value
+                                ? <Clear />
+                                : <Add />}
                         </IconButton>
                     </Box>
                 )
