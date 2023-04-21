@@ -2,7 +2,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import { Box, Typography, IconButton } from "@mui/material";
 import { Add, Clear, ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import { useDispatch } from "react-redux";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 
 const currency = '$';
 
@@ -16,7 +16,7 @@ export const TickerList = ({ title, rows }) => {
         });
     }, []);
 
-    const columns = useMemo([
+    const columns = [
         { field: 'ticker', headerName: 'Ticker', width: '80' },
         { field: 'exchange', headerName: 'Exchange', width: '90' },
         { field: 'name', headerName: 'Name', width: '110' },
@@ -88,7 +88,8 @@ export const TickerList = ({ title, rows }) => {
                 )
             },
         },
-    ], []);
+    ];
+
     return (
         <Box width={840} margin={'auto'} marginY={2}>
             <Typography variant="h4" align="center" my={1}>

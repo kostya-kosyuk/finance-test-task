@@ -1,7 +1,5 @@
 import React, { useEffect, useMemo, useCallback } from "react";
-import { DataGrid } from "@mui/x-data-grid";
 import io from 'socket.io-client';
-import { Box, Typography } from "@mui/material";
 import { useDispatch, useSelector } from 'react-redux';
 import { getRows } from '../helpers/getRows';
 import TickerList from "./TickerList";
@@ -23,10 +21,6 @@ const Data = () => {
         type: 'SET_QUOTES',
         payload: quotes
     }), []);
-
-
-
-
 
     useEffect(() => {
         const socket = io('http://localhost:4000');
