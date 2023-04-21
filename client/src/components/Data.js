@@ -1,13 +1,14 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useEffect, useMemo, useCallback } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import io from 'socket.io-client';
-import { Box, IconButton } from "@mui/material";
-import { Add, Clear } from '@mui/icons-material';
+import { Box, IconButton, Typography } from "@mui/material";
+import { Add, Clear, ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 
 const Data = () => {
     const dispatch = useDispatch();
     const quotes = useSelector(state => state.quotes.quotes);
+    const currency = '$';
 
     const trackedQuotes = useMemo(() => quotes
         ? quotes.filter(({isTracked}) => isTracked)
@@ -31,15 +32,42 @@ const Data = () => {
     }, []);
 
     const columns = [
-        { field: 'ticker', headerName: 'Ticker' },
-        { field: 'exchange', headerName: 'Exchange' },
-        { field: 'price', headerName: 'Price', type: 'number' },
-        { field: 'change', headerName: 'Change', type: 'number' },
-        { field: 'change_percent', headerName: 'Change Percent', type: 'number' },
-        { field: 'dividend', headerName: 'Dividend', type: 'number' },
-        { field: 'yield', headerName: 'Yield', type: 'number' },
-        {
-            field: 'last_trade_time', headerName: 'Last Trade Time', type: 'dateTime',
+        { field: 'ticker', headerName: 'Ticker', width: '80'},
+        { field: 'exchange', headerName: 'Exchange', width: '90'},
+        { field: 'price', headerName: 'Price', type: 'number', width: '70' },
+        { field: 'change', headerName: 'Change', type: 'number', width: '70',
+            renderCell: (params) => {
+                const { value } = params;
+                return (<Box
+                    sx={{color: value < 0 ? '#a50e0e' : '#137333'}}
+                >
+                    {value > 0 ? `+${value} ${currency}` : `${value}  ${currency}`}
+                </Box>);
+            }
+        },
+        { field: 'change_percent', headerName: 'Percent', type: 'number', width: '90',
+            renderCell: (params) => {
+                const { value } = params;
+                return (<Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        bgcolor: value > 0 ? '#e6f4ea' : '#fce8e6',
+                        color: value > 0 ? '#137333' : '#a50e0e',
+                        borderRadius: '8px',
+                        paddingX: '8px',
+                        paddingY: '4px',
+                    }}
+                >
+                    {value > 0 ? <ArrowUpward sx={{ fontSize: 16, pb: '2px' }} /> : <ArrowDownward sx={{ fontSize: 16, pb: '2px' }} />}
+                    {Math.abs(value)}
+                </Box>);
+
+            } },
+        { field: 'dividend', headerName: 'Dividend', type: 'number', width: '80' },
+        { field: 'yield', headerName: 'Yield', type: 'number', width: '70' },
+        { field: 'last_trade_time', headerName: 'Last Trade Time', type: 'dateTime', width: '90',
             renderCell: (params) => {
                 return (
                     <div>
@@ -49,7 +77,7 @@ const Data = () => {
             }
         },
         {
-            field: 'isTracked', headerName: 'Is Tracked',
+            field: 'isTracked', headerName: 'Tracking', width: '80',
             renderCell: (params) => {
                 return (
                     <Box width={'100%'}
@@ -95,7 +123,10 @@ const Data = () => {
             <>
             {quotes
                 ? (<>
-                    <Box width={920} margin={'auto'} marginY={2}>
+                    <Box width={730} margin={'auto'} marginY={2}>
+                        <Typography variant="h4" align="center" my={1}>
+                            Your list
+                        </Typography>
                         <DataGrid
                             autoHeight
                             rowCount={quotes.length}
@@ -103,7 +134,10 @@ const Data = () => {
                             rows={getRows(trackedQuotes)}
                         />
                     </Box>
-                    <Box width={920} margin={'auto'} marginY={2}>
+                    <Box width={730} margin={'auto'} marginY={2}>
+                        <Typography variant="h4" align="center" my={1}>
+                            All tickers list
+                        </Typography>
                         <DataGrid
                             autoHeight
                             rowCount={quotes.length}
