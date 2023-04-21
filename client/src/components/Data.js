@@ -10,12 +10,12 @@ const Data = () => {
     const quotes = useSelector(state => state.quotes.quotes);
 
     const trackedQuotes = useMemo(() => quotes
-        ? quotes.filter(qoute => qoute.isTracked)
-        : null,
+        ? quotes.filter(({isTracked}) => isTracked)
+        : [],
     [quotes]);
     const untrackedQuotes = useMemo(() => quotes
-        ? quotes.filter(qoute => !qoute.isTracked)
-        : null,
+        ? quotes.filter(({ isTracked }) => !isTracked)
+        : quotes,
     [quotes]);
 
     const handleQuotesUpdate = useCallback((quotes) => dispatch({
@@ -23,10 +23,12 @@ const Data = () => {
         payload: quotes
     }), []);
 
-    const handleToggleQuoteTracking = useCallback((id) => dispatch({
+    const handleToggleQuoteTracking = useCallback((id) => {
+        dispatch({
             type: 'TOGGLE_QUOTE_TRACKING',
             payload: id
-        }), []);
+        });
+    }, []);
 
     const columns = [
         { field: 'ticker', headerName: 'Ticker' },
@@ -60,7 +62,7 @@ const Data = () => {
                         <IconButton
                             onClick={() => handleToggleQuoteTracking(params.row.id)}
                         >
-                            {params.value
+                            {params.row.isTracked
                                 ? <Clear />
                                 : <Add />}
                         </IconButton>

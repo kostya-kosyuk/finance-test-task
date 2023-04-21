@@ -1,3 +1,5 @@
+import { isIdinLocalStorage, removeIdFromLocalStorage, addTickerIdToLocalStorage} from '../utils/localStorage';
+
 const initialState = {
     quotes: [],
 };
@@ -5,15 +7,9 @@ const initialState = {
 export const quotesReducer = (state = initialState, action) => {
     switch (action.type) {
         case 'SET_QUOTES':  {
-            if (state.quotes.length === 0) {
-                return {
-                    ...state, quotes: action.payload
-                };
-            }
-
             const updatedQuotes = action.payload.map((newQuote) => {
                 const oldQuote = state.quotes.find(quote => quote.id === newQuote.id);
-                return oldQuote ? {...oldQuote, ...newQuote } : newQuote;
+                return oldQuote ? {...oldQuote, ...newQuote } : {...newQuote, isTracked: isIdinLocalStorage(newQuote.id)};
             });
 
             const oldQuotes = state.quotes.filter((oldQuote) => !updatedQuotes.find(newQuote => newQuote.id === oldQuote.id));
@@ -34,6 +30,12 @@ export const quotesReducer = (state = initialState, action) => {
             const updatedQuotes = [...state.quotes];
             const quoteByIndex = updatedQuotes[quoteIndex];
             quoteByIndex.isTracked = !quoteByIndex.isTracked;
+
+            if (quoteByIndex.isTracked) {
+                addTickerIdToLocalStorage(id);
+            } else {
+                removeIdFromLocalStorage(id);
+            }
 
             return {
                 ...state,
