@@ -2,18 +2,30 @@ const { randomValue } = require('../utils/randomValue');
 const { getUTCDate } = require('../utils/getUTCDate');
 
 const tickers = [
-    'AAPL', // Apple
-    'GOOGL', // Alphabet
-    'MSFT', // Microsoft
-    'AMZN', // Amazon
-    'FB', // Facebook
-    'TSLA', // Tesla
+    { ticker: 'AAPL', name: 'Apple'},
+    { ticker: 'GOOGL', name: 'Alphabet' },
+    { ticker: 'MSFT', name: 'Microsoft' },
+    { ticker: 'AMZN', name: 'Amazon' },
+    { ticker: 'FB', name: 'Facebook' },
+    { ticker: 'NFLX', name: 'Netflix' },
+    { ticker: 'AMD', name: 'Advanced Micro Devices' },
+    { ticker: 'PYPL', name: 'Paypal Holdings' },
+    { ticker: 'FMC1', name: 'Ford Motor' },
+    { ticker: 'V', name: 'Visa' },
+    { ticker: 'BAC', name: 'Bank of America' },
+    { ticker: 'PFE', name: 'Pfizer' },
+    { ticker: 'INTC', name: 'Intel' },
+    { ticker: 'BOE', name: 'Boeing' },
+    { ticker: 'GE', name: 'General Electric' },
+    { ticker: 'MTE', name: 'Micron' },
+    { ticker: 'WMT', name: 'Walmart' },
 ];
 
 const createQuotes = () => {
-    return tickers.map(ticker => ({
+    return tickers.map(({ ticker, name }) => ({
         id: ticker,
         ticker,
+        name,
         startPrice: randomValue(100, 300, 2),
         exchange: 'NASDAQ',
     }));
