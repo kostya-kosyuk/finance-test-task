@@ -3,6 +3,8 @@ import io from 'socket.io-client';
 import { useDispatch, useSelector } from 'react-redux';
 import { getRows } from '../helpers/getRows';
 import TickerList from "./TickerList";
+import { setQuotes } from "../store/quotesActions";
+import { setSocket, setSocketInterval, socketConnected, socketDisconnected } from '../store/socketAction';
 
 const Data = () => {
     const dispatch = useDispatch();
@@ -17,16 +19,13 @@ const Data = () => {
         : getRows(quotes),
     [quotes]);
 
-    const handleQuotesUpdate = useCallback((quotes) => dispatch({
-        type: 'SET_QUOTES',
-        payload: quotes
-    }), []);
+    const handleQuotesUpdate = useCallback((quotes) => dispatch(setQuotes(quotes)), []);
 
     useEffect(() => {
         const socket = io('http://localhost:4000');
 
         socket.on('connect', () => {
-            socket.emit('start');
+            dispatch(socketConnected(true));
         });
 
         socket.on('ticker', (quotes) => {
@@ -34,7 +33,10 @@ const Data = () => {
         });
 
         socket.on('disconnect', () => {
+            dispatch(socketDisconnected(false));
         });
+
+        dispatch(setSocket(socket));
 
         return () => {
             socket.disconnect();

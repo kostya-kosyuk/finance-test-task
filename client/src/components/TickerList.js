@@ -3,6 +3,7 @@ import { Box, Typography, IconButton } from "@mui/material";
 import { Add, Clear, ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import { useDispatch } from "react-redux";
 import { useCallback } from "react";
+import { toggleQuoteTracking } from "../store/quotesActions";
 
 const currency = '$';
 
@@ -10,10 +11,7 @@ export const TickerList = ({ title, rows }) => {
     const dispatch = useDispatch();
 
     const handleToggleQuoteTracking = useCallback((id) => {
-        dispatch({
-            type: 'TOGGLE_QUOTE_TRACKING',
-            payload: id
-        });
+        dispatch(toggleQuoteTracking(id));
     }, []);
 
     const columns = [
