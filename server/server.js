@@ -3,36 +3,9 @@ const express = require('express');
 const http = require('http');
 const io = require('socket.io');
 const cors = require('cors');
-const { getRandomQuotes, initialChangeQuotes } = require('./service/quotes');
+const trackTickers = require('./utils/socket');
 
-const FETCH_INTERVAL = 5000;
 const PORT = process.env.PORT || 4000;
-
-function sendChangedQuotes(socket) {
-  const changedQuotes = getRandomQuotes();
-
-  socket.emit('ticker', changedQuotes);
-}
-
-function sendInitialQuotes(socket) {
-  const initialQuotes = initialChangeQuotes();
-
-  socket.emit('ticker', initialQuotes);
-}
-
-function trackTickers(socket, interval = FETCH_INTERVAL) {
-  // run the first time immediately
-  sendInitialQuotes(socket);
-
-  // every N seconds
-  const timer = setInterval(function() {
-    sendChangedQuotes(socket);
-  }, interval);
-
-  socket.on('disconnect', function () {
-    clearInterval(timer);
-  });
-}
 
 const app = express();
 app.use(cors());

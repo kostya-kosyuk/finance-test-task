@@ -1,4 +1,4 @@
-import { isIdinLocalStorage, removeIdFromLocalStorage, addTickerIdToLocalStorage} from '../utils/localStorage';
+import { isIdinLocalStorage, removeIdFromLocalStorage, addTickerIdToLocalStorage} from '../utils/tickersLocalStorage';
 
 const initialState = {
     quotes: [],
