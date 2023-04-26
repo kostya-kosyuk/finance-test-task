@@ -3,7 +3,7 @@ const express = require('express');
 const http = require('http');
 const io = require('socket.io');
 const cors = require('cors');
-const trackTickers = require('./utils/socket');
+const {trackTickers} = require('./utils/socket');
 
 const PORT = process.env.PORT || 4000;
 

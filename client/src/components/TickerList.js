@@ -1,7 +1,7 @@
 import { DataGrid } from "@mui/x-data-grid";
-import { Box, Typography, IconButton } from "@mui/material";
+import { Box, Typography, IconButton, LinearProgress } from "@mui/material";
 import { Add, Clear, ArrowUpward, ArrowDownward } from '@mui/icons-material';
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useCallback } from "react";
 import { toggleQuoteTracking } from "../store/quotesActions";
 
@@ -9,6 +9,7 @@ const currency = '$';
 
 export const TickerList = ({ title, rows }) => {
     const dispatch = useDispatch();
+    const isLoading = !useSelector(state => state.socket.isConnected);
 
     const handleToggleQuoteTracking = useCallback((id) => {
         dispatch(toggleQuoteTracking(id));
@@ -103,6 +104,13 @@ export const TickerList = ({ title, rows }) => {
                     pagination: { paginationModel: { pageSize: 5 } },
                 }}
                 pageSizeOptions={[5, 10, 15]}
+
+
+                slots={{
+                    loadingOverlay: LinearProgress,
+                }}
+
+                loading={isLoading}
             />
         </Box>
     );

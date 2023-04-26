@@ -1,4 +1,4 @@
-const { getRandomQuotes, initialChangeQuotes } = require('./service/quotes');
+const { getRandomQuotes, initialChangeQuotes } = require('../service/quotes');
 
 const FETCH_INTERVAL = 5000;
 let currentTimer = null;
@@ -15,7 +15,7 @@ function sendInitialQuotes(socket) {
     socket.emit('ticker', initialQuotes);
 }
 
-function trackTickers(socket, interval = FETCH_INTERVAL) {
+function trackTickers(socket, interval) {
     // run the first time immediately
     sendInitialQuotes(socket);
 
@@ -24,7 +24,6 @@ function trackTickers(socket, interval = FETCH_INTERVAL) {
     // every N seconds
     const timer = setInterval(function () {
         sendChangedQuotes(socket);
-        console.log(interval);
     }, interval);
 
     currentTimer = timer;
